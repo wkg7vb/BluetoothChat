@@ -125,8 +125,7 @@ class MainActivity : ComponentActivity() {
                                 state = state,
                                 onStartScan = viewModel::startScan,
                                 onStopScan = viewModel::stopScan,
-                                onDeviceClick = viewModel::connectToDevice,
-                                onStartServer = viewModel::waitForIncomingConnections
+                                onDeviceClick = viewModel::connectToDevice
                             )
                         }
                     }
