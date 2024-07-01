@@ -21,6 +21,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
+import com.plcoding.bluetoothchat.data.chat.BluetoothDataTransferService
 import com.plcoding.bluetoothchat.domain.chat.BluetoothDevice
 import com.plcoding.bluetoothchat.presentation.BluetoothUiState
 
@@ -59,6 +60,9 @@ fun ChatScreen(
             Button(onClick = { /*TODO*/ }) {
                 Text(text = "Get Vin")
             }
+//            Button(onClick = { BluetoothDataTransferService.getVIN() }) {
+//                Text(text = "Get Vin")
+//            }
         }
     }
 }

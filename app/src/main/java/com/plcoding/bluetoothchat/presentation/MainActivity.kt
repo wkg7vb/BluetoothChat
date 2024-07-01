@@ -120,6 +120,10 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         else -> {
+//                            ChatScreen(
+//                                state = state,
+//                                onDisconnect = viewModel::disconnectFromDevice
+//                            )
                             DeviceScreen(
                                 state = state,
                                 onStartScan = viewModel::startScan,

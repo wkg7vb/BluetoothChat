@@ -24,8 +24,7 @@ class BluetoothViewModel @Inject constructor(
     ) { scannedDevices, pairedDevices, state ->
         state.copy(
             scannedDevices = scannedDevices,
-            pairedDevices = pairedDevices,
-            messages = if(state.isConnected) state.messages else emptyList()
+            pairedDevices = pairedDevices
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _state.value)
 
@@ -59,23 +58,23 @@ class BluetoothViewModel @Inject constructor(
         ) }
     }
 
-    fun waitForIncomingConnections() {
-        _state.update { it.copy(isConnecting = true) }
-        deviceConnectionJob = bluetoothController
-            .startBluetoothServer()
-            .listen()
-    }
-
-    fun sendMessage(message: String) {
-        viewModelScope.launch {
-            val bluetoothMessage = bluetoothController.trySendMessage(message)
-            if(bluetoothMessage != null) {
-                _state.update { it.copy(
-                    messages = it.messages + bluetoothMessage
-                ) }
-            }
-        }
-    }
+//    fun waitForIncomingConnections() {
+//        _state.update { it.copy(isConnecting = true) }
+//        deviceConnectionJob = bluetoothController
+//            .startBluetoothServer()
+//            .listen()
+//    }
+//
+//    fun sendMessage(message: String) {
+//        viewModelScope.launch {
+//            val bluetoothMessage = bluetoothController.trySendMessage(message)
+//            if(bluetoothMessage != null) {
+//                _state.update { it.copy(
+//                    messages = it.messages + bluetoothMessage
+//                ) }
+//            }
+//        }
+//    }
 
     fun startScan() {
         bluetoothController.startDiscovery()
@@ -93,11 +92,6 @@ class BluetoothViewModel @Inject constructor(
                         isConnected = true,
                         isConnecting = false,
                         errorMessage = null
-                    ) }
-                }
-                is ConnectionResult.TransferSucceeded -> {
-                    _state.update { it.copy(
-                        messages = it.messages + result.message
                     ) }
                 }
                 is ConnectionResult.Error -> {
