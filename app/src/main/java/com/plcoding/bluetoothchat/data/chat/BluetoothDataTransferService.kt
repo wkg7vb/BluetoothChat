@@ -1,6 +1,9 @@
 package com.plcoding.bluetoothchat.data.chat
 
 import android.bluetooth.BluetoothSocket
+import android.util.Log
+import com.github.eltonvs.obd.command.ObdResponse
+import com.github.eltonvs.obd.command.control.VINCommand
 import com.github.eltonvs.obd.connection.ObdDeviceConnection
 import com.plcoding.bluetoothchat.domain.chat.BluetoothMessage
 import com.plcoding.bluetoothchat.domain.chat.ConnectionResult
@@ -52,9 +55,10 @@ class BluetoothDataTransferService(
         }
     }
 
-    val obdConnection = ObdDeviceConnection(socket.inputStream, socket.outputStream)
+    private val obdConnection = ObdDeviceConnection(socket.inputStream, socket.outputStream)
 
-    obdConnection.run()
-
-    val response = ObdDeviceConnection.run()
+    suspend fun getVIN(){
+        val tempVIN = obdConnection.run(VINCommand())
+        Log.i("", "VIN: $tempVIN")
+    }
 }
