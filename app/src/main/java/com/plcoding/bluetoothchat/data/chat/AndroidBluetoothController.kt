@@ -10,6 +10,7 @@ import android.bluetooth.BluetoothSocket
 import android.content.Context
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.util.Log
 import com.plcoding.bluetoothchat.domain.chat.BluetoothController
 import com.plcoding.bluetoothchat.domain.chat.BluetoothDeviceDomain
 import com.plcoding.bluetoothchat.domain.chat.ConnectionResult
@@ -24,6 +25,7 @@ import java.util.*
 class AndroidBluetoothController(
     private val context: Context
 ): BluetoothController {
+    private val TAG = "AndroidBluetoothController"
 
     private val bluetoothManager by lazy {
         context.getSystemService(BluetoothManager::class.java)
@@ -71,6 +73,7 @@ class AndroidBluetoothController(
     private var currentClientSocket: BluetoothSocket? = null
 
     init {
+        Log.i(TAG,"init()")
         updatePairedDevices()
         context.registerReceiver(
             bluetoothStateReceiver,
@@ -83,6 +86,7 @@ class AndroidBluetoothController(
     }
 
     override fun startDiscovery() {
+        Log.i(TAG,"startDiscovery()")
         if(!hasPermission(Manifest.permission.BLUETOOTH_SCAN)) {
             return
         }
@@ -98,6 +102,7 @@ class AndroidBluetoothController(
     }
 
     override fun stopDiscovery() {
+        Log.i(TAG,"stopDiscovery()")
         if(!hasPermission(Manifest.permission.BLUETOOTH_SCAN)) {
             return
         }
@@ -106,6 +111,7 @@ class AndroidBluetoothController(
     }
 
     override fun startBluetoothServer(): Flow<ConnectionResult> {
+        Log.i(TAG,"startBluetoothServer()")
         return flow {
             if(!hasPermission(Manifest.permission.BLUETOOTH_CONNECT)) {
                 throw SecurityException("No BLUETOOTH_CONNECT permission")
@@ -145,6 +151,7 @@ class AndroidBluetoothController(
     }
 
     override fun connectToDevice(device: BluetoothDeviceDomain): Flow<ConnectionResult> {
+        Log.i(TAG,"connectToDevice()")
         return flow {
             if(!hasPermission(Manifest.permission.BLUETOOTH_CONNECT)) {
                 throw SecurityException("No BLUETOOTH_CONNECT permission")
@@ -177,6 +184,7 @@ class AndroidBluetoothController(
     }
 
     override fun closeConnection() {
+        Log.i(TAG, "closeConnection()")
         currentClientSocket?.close()
         currentServerSocket?.close()
         currentClientSocket = null
@@ -184,12 +192,14 @@ class AndroidBluetoothController(
     }
 
     override fun release() {
+        Log.i(TAG,"release()")
         context.unregisterReceiver(foundDeviceReceiver)
         context.unregisterReceiver(bluetoothStateReceiver)
         closeConnection()
     }
 
     private fun updatePairedDevices() {
+        Log.i(TAG,"updatePairedDevices()")
         if(!hasPermission(Manifest.permission.BLUETOOTH_CONNECT)) {
             return
         }
@@ -202,6 +212,7 @@ class AndroidBluetoothController(
     }
 
     private fun hasPermission(permission: String): Boolean {
+        Log.i(TAG,"hasPermission()")
         return context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
     }
 

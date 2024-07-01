@@ -8,9 +8,11 @@ import com.github.eltonvs.obd.connection.ObdDeviceConnection
 class BluetoothDataTransferService(
     private val socket: BluetoothSocket
 ) {
+    private val TAG = "BluetoothDataTransferService"
     private val obdConnection = ObdDeviceConnection(socket.inputStream, socket.outputStream)
 
     suspend fun getVIN(): String{
+        Log.i(TAG,"getVIN()")
         val tempVIN = obdConnection.run(VINCommand())
         Log.i("BluetoothDataTransferService.getVIN()", "VIN: $tempVIN")
         return tempVIN.value

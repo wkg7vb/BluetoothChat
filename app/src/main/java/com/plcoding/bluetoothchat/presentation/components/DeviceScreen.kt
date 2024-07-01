@@ -76,22 +76,22 @@ fun BluetoothDeviceList(
             )
         }
 
-//        item {
-//            Text(
-//                text = "Scanned Devices",
-//                fontWeight = FontWeight.Bold,
-//                fontSize = 24.sp,
-//                modifier = Modifier.padding(16.dp)
-//            )
-//        }
-//        items(scannedDevices) { device ->
-//            Text(
-//                text = device.name ?: "(No name)",
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .clickable { onClick(device) }
-//                    .padding(16.dp)
-//            )
-//        }
+        item {
+            Text(
+                text = "Scanned Devices",
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+        items(scannedDevices) { device ->
+            Text(
+                text = device.name ?: "(No name)",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onClick(device) }
+                    .padding(16.dp)
+            )
+        }
     }
 }
