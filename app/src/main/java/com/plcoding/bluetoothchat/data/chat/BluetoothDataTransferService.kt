@@ -18,6 +18,13 @@ import java.io.IOException
 class BluetoothDataTransferService(
     private val socket: BluetoothSocket
 ) {
+    val obdConnection = ObdDeviceConnection(socket.inputStream, socket.outputStream)
+
+    suspend fun getVIN(){
+        val tempVIN = obdConnection.run(VINCommand())
+        Log.i("", "VIN: $tempVIN")
+    }
+
     fun listenForIncomingMessages(): Flow<BluetoothMessage> {
         return flow {
             if(!socket.isConnected) {
@@ -53,12 +60,5 @@ class BluetoothDataTransferService(
 
             true
         }
-    }
-
-    private val obdConnection = ObdDeviceConnection(socket.inputStream, socket.outputStream)
-
-    suspend fun getVIN(){
-        val tempVIN = obdConnection.run(VINCommand())
-        Log.i("", "VIN: $tempVIN")
     }
 }

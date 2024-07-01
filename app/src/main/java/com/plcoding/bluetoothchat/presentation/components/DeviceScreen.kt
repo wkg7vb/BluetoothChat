@@ -44,9 +44,6 @@ fun DeviceScreen(
             Button(onClick = onStopScan) {
                 Text(text = "Stop scan")
             }
-            Button(onClick = { BluetoothDataTransferService.getVIN() }) {
-                Text(text = "Get Vin")
-            }
         }
     }
 }

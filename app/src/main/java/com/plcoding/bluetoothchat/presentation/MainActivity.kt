@@ -116,8 +116,7 @@ class MainActivity : ComponentActivity() {
                         state.isConnected -> {
                             ChatScreen(
                                 state = state,
-                                onDisconnect = viewModel::disconnectFromDevice,
-                                onSendMessage = viewModel::sendMessage
+                                onDisconnect = viewModel::disconnectFromDevice
                             )
                         }
                         else -> {
