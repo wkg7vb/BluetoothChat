@@ -1,6 +1,7 @@
 package com.plcoding.bluetoothchat.data.chat
 
 import android.bluetooth.BluetoothSocket
+import com.github.eltonvs.obd.connection.ObdDeviceConnection
 import com.plcoding.bluetoothchat.domain.chat.BluetoothMessage
 import com.plcoding.bluetoothchat.domain.chat.ConnectionResult
 import com.plcoding.bluetoothchat.domain.chat.TransferFailedException
@@ -50,4 +51,10 @@ class BluetoothDataTransferService(
             true
         }
     }
+
+    val obdConnection = ObdDeviceConnection(socket.inputStream, socket.outputStream)
+
+    obdConnection.run()
+
+    val response = ObdDeviceConnection.run()
 }
