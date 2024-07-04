@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.plcoding.bluetoothchat.createBluetoothConnection
 import com.plcoding.bluetoothchat.domain.chat.BluetoothDevice
 import com.plcoding.bluetoothchat.presentation.BluetoothUiState
 
@@ -77,24 +78,33 @@ fun BluetoothDeviceList(
                     .clickable { onClick(device) }
                     .padding(16.dp)
             )
-        }
-
-        item {
             Text(
-                text = "Scanned Devices",
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
-        items(scannedDevices) { device ->
-            Text(
-                text = device.name ?: "(No name)",
+                text = device.address,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onClick(device) }
+                    .clickable {
+                        createBluetoothConnection(device.address)
+                    }
                     .padding(16.dp)
             )
         }
+
+//        item {
+//            Text(
+//                text = "Scanned Devices",
+//                fontWeight = FontWeight.Bold,
+//                fontSize = 24.sp,
+//                modifier = Modifier.padding(16.dp)
+//            )
+//        }
+//        items(scannedDevices) { device ->
+//            Text(
+//                text = device.name ?: "(No name)",
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .clickable { onClick(device) }
+//                    .padding(16.dp)
+//            )
+//        }
     }
 }
