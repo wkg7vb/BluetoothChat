@@ -1,5 +1,7 @@
 package com.plcoding.bluetoothchat.presentation.components
 
+import android.bluetooth.BluetoothAdapter
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -7,6 +9,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -14,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import com.plcoding.bluetoothchat.createBluetoothConnection
 import com.plcoding.bluetoothchat.domain.chat.BluetoothDevice
 import com.plcoding.bluetoothchat.presentation.BluetoothUiState
+import dagger.hilt.android.qualifiers.ApplicationContext
 
 @Composable
 fun DeviceScreen(
@@ -21,7 +28,8 @@ fun DeviceScreen(
     onStartScan: () -> Unit,
     onStopScan: () -> Unit,
     onStartServer: () -> Unit,
-    onDeviceClick: (BluetoothDevice) -> Unit
+    onDeviceClick: (BluetoothDevice) -> Unit,
+    bluetoothAdapter: BluetoothAdapter
 ) {
     Column(
         modifier = Modifier
@@ -33,7 +41,8 @@ fun DeviceScreen(
             onClick = onDeviceClick,
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
+                .weight(1f),
+            bluetoothAdapter = bluetoothAdapter
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -57,8 +66,11 @@ fun BluetoothDeviceList(
     pairedDevices: List<BluetoothDevice>,
     scannedDevices: List<BluetoothDevice>,
     onClick: (BluetoothDevice) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    bluetoothAdapter: BluetoothAdapter
 ) {
+    var temp by remember { mutableStateOf("") }
+
     LazyColumn(
         modifier = modifier
     ) {
@@ -78,15 +90,10 @@ fun BluetoothDeviceList(
                     .clickable { onClick(device) }
                     .padding(16.dp)
             )
-            Text(
-                text = device.address,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        createBluetoothConnection(device.address)
-                    }
-                    .padding(16.dp)
-            )
+            Button(onClick = { temp = createBluetoothConnection(device.address, bluetoothAdapter) }) {
+                Text(text = "Send Command")
+            }
+            Text(temp)
         }
 
 //        item {

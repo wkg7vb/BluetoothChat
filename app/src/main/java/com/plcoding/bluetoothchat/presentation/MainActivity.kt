@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
         applicationContext.getSystemService(BluetoothManager::class.java)
     }
     private val bluetoothAdapter by lazy {
-        bluetoothManager?.adapter
+        bluetoothManager.adapter
     }
 
     private val isBluetoothEnabled: Boolean
@@ -118,7 +118,8 @@ class MainActivity : ComponentActivity() {
                                 onStartScan = viewModel::startScan,
                                 onStopScan = viewModel::stopScan,
                                 onDeviceClick = viewModel::connectToDevice,
-                                onStartServer = viewModel::waitForIncomingConnections
+                                onStartServer = viewModel::waitForIncomingConnections,
+                                bluetoothAdapter = bluetoothAdapter
                             )
                         }
                     }
