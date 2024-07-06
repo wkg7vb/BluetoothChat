@@ -76,6 +76,7 @@ fun createBluetoothConnection(
             closeException.printStackTrace()
             return "FAILED: Could not close socket"
         }
+        Log.i(TAG, "FAILED: Could not open socket")
         return "FAILED: Could not open socket"
     }
 
