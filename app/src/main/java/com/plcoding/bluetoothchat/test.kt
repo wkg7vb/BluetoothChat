@@ -106,30 +106,28 @@ fun manageConnectedSocket(
             Log.i(TAG, "OBD Connection Secured")
 
             var response = obdConnection.run(ResetAdapterCommand())
+            var responseCommand = response.command.name
             var responseValue = response.value
-            Log.i(TAG, "Reset Adapter Command: $responseValue")
+            Log.i(TAG, "$responseCommand: $responseValue")
 
             response = obdConnection.run(SelectProtocolCommand(ObdProtocols.AUTO))
+            responseCommand = response.command.name
             responseValue = response.value
-            Log.i(TAG, "Select Protocol Command: $responseValue")
+            Log.i(TAG, "$responseCommand: $responseValue")
 
             response = obdConnection.run(BypassInitializationCommand())
+            responseCommand = response.command.name
             responseValue = response.value
-            Log.i(TAG, "Bypass Init Command: $responseValue")
+            Log.i(TAG, "$responseCommand: $responseValue")
 
-//            response = obdConnection.run().value
-//            var response2 = response.value
-//            Log.i(TAG, ": $response2")
-
-//            response = obdConnection.run(VINCommand()).value
-//            Log.i(TAG, "VIN Command: $response")
-
-//            response = obdConnection.run(SpeedCommand()).value
-//            Log.i(TAG, "Speed Command: $response")
+            response = obdConnection.run(BypassInitializationCommand())
+            responseCommand = response.command.name
+            responseValue = response.value
+            Log.i(TAG, "$responseCommand: $responseValue")
 
         }catch (obdException: RuntimeException){
             obdException.printStackTrace()
         }
     }
-    return@runBlocking "Connection Tested"
+    return@runBlocking
 }
