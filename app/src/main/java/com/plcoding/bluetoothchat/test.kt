@@ -27,11 +27,11 @@ fun createBluetoothConnection(
     Log.i(TAG, "createBluetoothConnection()")
 
 
-//    if (bluetoothAdapter == null) {
-//        // Device doesn't support Bluetooth
-//        Log.i(TAG,"Device doesn't support Bluetooth")
-//        return
-//    }
+    if (bluetoothAdapter == null) {
+        // Device doesn't support Bluetooth
+        Log.i(TAG,"Device doesn't support Bluetooth")
+        return "FAILED: Device doesn't support Bluetooth"
+    }
 
     if (!bluetoothAdapter.isEnabled) {
         // Bluetooth is not enabled
@@ -43,24 +43,28 @@ fun createBluetoothConnection(
     // Get the BluetoothDevice object
     val device: BluetoothDevice = bluetoothAdapter.getRemoteDevice(deviceAddress)
 
+    //Get the UUID of the bluetooth device
+    val uuid:UUID = device.uuids[0].uuid
+
     // Create a BluetoothSocket
     var bluetoothSocket: BluetoothSocket? = null
     try {
         Log.i(TAG,"Creating socket from UUID")
 //        bluetoothSocket = device.createRfcommSocketToServiceRecord(MY_UUID)
-        bluetoothSocket = device.createInsecureRfcommSocketToServiceRecord(UUID.randomUUID())
+        bluetoothSocket = device.createRfcommSocketToServiceRecord(uuid)
+//        bluetoothSocket = device.createInsecureRfcommSocketToServiceRecord(UUID.randomUUID())
         Log.i(TAG,"Creating socket from UUID COMPLETE")
     } catch (e: IOException) {
-        Log.i(TAG, "IO Exception: Could not create")
+        Log.i(TAG, "IO Exception: Could not create socket from UUID")
         e.printStackTrace()
-        return "FAILED: Could not create socket"
+        return "FAILED: Could not create socket from UUID"
     }
 
     bluetoothAdapter.cancelDiscovery()
 
     try {
         Log.i(TAG, "Opening socket")
-        bluetoothSocket?.connect()
+        bluetoothSocket.connect()
         Log.i(TAG, "Opening socket COMPLETE")
         // Connection successful
         // You can now manage your connection (in a separate thread)
@@ -69,7 +73,7 @@ fun createBluetoothConnection(
         connectException.printStackTrace()
         try {
             Log.i(TAG, "Closing Socket")
-            bluetoothSocket?.close()
+            bluetoothSocket.close()
             Log.i(TAG, "Closing Socket COMPLETE")
         } catch (closeException: IOException) {
             Log.i(TAG, "IO Exception: Could not close")
@@ -88,6 +92,7 @@ fun manageConnectedSocket(socket: BluetoothSocket?): String = runBlocking {
     val TAG = "manageConnectedSocket"
     // Code to manage the connection in a separate thread
     Log.i(TAG, "manageConnectedSocket()")
+//    val obdConnection = socket?.let { ObdDeviceConnection(it.inputStream, it.outputStream) }
     val obdConnection = socket?.let { ObdDeviceConnection(it.inputStream, it.outputStream) }
     Log.i(TAG, "OBD Connection Secured")
     val response = obdConnection?.run(SpeedCommand())
