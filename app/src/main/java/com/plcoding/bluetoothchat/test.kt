@@ -7,11 +7,15 @@ import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothSocket
 import android.content.Context
 import android.util.Log
+import com.github.eltonvs.obd.command.engine.RPMCommand
 import com.github.eltonvs.obd.command.engine.SpeedCommand
 import com.github.eltonvs.obd.connection.ObdDeviceConnection
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import java.util.UUID
 
 
@@ -44,15 +48,14 @@ fun createBluetoothConnection(
     val device: BluetoothDevice = bluetoothAdapter.getRemoteDevice(deviceAddress)
 
     //Get the UUID of the bluetooth device
-    val uuid:UUID = device.uuids[0].uuid
+//    val uuid:UUID = device.uuids[0].uuid
 
     // Create a BluetoothSocket
     var bluetoothSocket: BluetoothSocket? = null
     try {
         Log.i(TAG,"Creating socket from UUID")
 //        bluetoothSocket = device.createRfcommSocketToServiceRecord(MY_UUID)
-        bluetoothSocket = device.createRfcommSocketToServiceRecord(uuid)
-//        bluetoothSocket = device.createInsecureRfcommSocketToServiceRecord(UUID.randomUUID())
+        bluetoothSocket = device.createInsecureRfcommSocketToServiceRecord(MY_UUID)
         Log.i(TAG,"Creating socket from UUID COMPLETE")
     } catch (e: IOException) {
         Log.i(TAG, "IO Exception: Could not create socket from UUID")
@@ -69,7 +72,7 @@ fun createBluetoothConnection(
         // Connection successful
         // You can now manage your connection (in a separate thread)
     } catch (connectException: IOException) {
-        Log.i(TAG, "IO Exception: Could not open")
+        Log.i(TAG, "IO Exception: Could not open", connectException)
         connectException.printStackTrace()
         try {
             Log.i(TAG, "Closing Socket")
@@ -85,20 +88,25 @@ fun createBluetoothConnection(
     }
 
     // Manage the connection in a separate thread
-    return manageConnectedSocket(bluetoothSocket)
+    val inputStream = bluetoothSocket.inputStream
+    val outputStream = bluetoothSocket.outputStream
+    return manageConnectedSocket(inputStream, outputStream)
 }
 
-fun manageConnectedSocket(socket: BluetoothSocket?): String = runBlocking {
+fun manageConnectedSocket(
+    inputStream:InputStream,
+    outputStream: OutputStream
+): String = runBlocking {
     val TAG = "manageConnectedSocket"
-    // Code to manage the connection in a separate thread
     Log.i(TAG, "manageConnectedSocket()")
-//    val obdConnection = socket?.let { ObdDeviceConnection(it.inputStream, it.outputStream) }
-    val obdConnection = socket?.let { ObdDeviceConnection(it.inputStream, it.outputStream) }
-    Log.i(TAG, "OBD Connection Secured")
-    val response = obdConnection?.run(SpeedCommand())
-    Log.i(TAG, "VIN: $response.value")
-
-    return@runBlocking "$response.value"
+    // Code to manage the connection in a separate thread
+    launch{
+        val obdConnection = ObdDeviceConnection(inputStream, outputStream)
+        Log.i(TAG, "OBD Connection Secured")
+//        val response = obdConnection.run(RPMCommand())
+//        Log.i(TAG, "$response.value")
+    }
+    return@runBlocking "TEST COMPLETE"
 
 //    // Example of writing data
 //    val message = "Hello, Bluetooth!"
