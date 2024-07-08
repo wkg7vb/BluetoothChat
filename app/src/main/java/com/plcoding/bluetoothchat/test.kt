@@ -7,6 +7,15 @@ import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothSocket
 import android.content.Context
 import android.util.Log
+import com.github.eltonvs.obd.command.AdaptiveTimingMode
+import com.github.eltonvs.obd.command.BadResponseException
+import com.github.eltonvs.obd.command.ObdProtocols
+import com.github.eltonvs.obd.command.ObdResponse
+import com.github.eltonvs.obd.command.at.BypassInitializationCommand
+import com.github.eltonvs.obd.command.at.ResetAdapterCommand
+import com.github.eltonvs.obd.command.at.SelectProtocolCommand
+import com.github.eltonvs.obd.command.at.SetAdaptiveTimingCommand
+import com.github.eltonvs.obd.command.control.VINCommand
 import com.github.eltonvs.obd.command.engine.RPMCommand
 import com.github.eltonvs.obd.command.engine.SpeedCommand
 import com.github.eltonvs.obd.connection.ObdDeviceConnection
@@ -26,7 +35,7 @@ private val MY_UUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34F
 fun createBluetoothConnection(
     deviceAddress: String,
     bluetoothAdapter: BluetoothAdapter
-): String {
+){
     val TAG = "createBluetoothConnection"
     Log.i(TAG, "createBluetoothConnection()")
 
@@ -34,14 +43,12 @@ fun createBluetoothConnection(
     if (bluetoothAdapter == null) {
         // Device doesn't support Bluetooth
         Log.i(TAG,"Device doesn't support Bluetooth")
-        return "FAILED: Device doesn't support Bluetooth"
     }
 
     if (!bluetoothAdapter.isEnabled) {
         // Bluetooth is not enabled
         // You might want to ask the user to enable it
         Log.i(TAG,"Bluetooth is not enabled")
-        return "FAILED: BT not enabled"
     }
 
     // Get the BluetoothDevice object
@@ -54,76 +61,75 @@ fun createBluetoothConnection(
     var bluetoothSocket: BluetoothSocket? = null
     try {
         Log.i(TAG,"Creating socket from UUID")
-//        bluetoothSocket = device.createRfcommSocketToServiceRecord(MY_UUID)
-        bluetoothSocket = device.createInsecureRfcommSocketToServiceRecord(MY_UUID)
+        bluetoothSocket = device.createRfcommSocketToServiceRecord(MY_UUID)
+//        bluetoothSocket = device.createInsecureRfcommSocketToServiceRecord(MY_UUID)
         Log.i(TAG,"Creating socket from UUID COMPLETE")
     } catch (e: IOException) {
         Log.i(TAG, "IO Exception: Could not create socket from UUID")
         e.printStackTrace()
-        return "FAILED: Could not create socket from UUID"
     }
 
     bluetoothAdapter.cancelDiscovery()
 
     try {
-        Log.i(TAG, "Opening socket")
-        bluetoothSocket.connect()
-        Log.i(TAG, "Opening socket COMPLETE")
+        bluetoothSocket!!.connect()
+        Log.i(TAG, "Socket Open")
         // Connection successful
         // You can now manage your connection (in a separate thread)
     } catch (connectException: IOException) {
-        Log.i(TAG, "IO Exception: Could not open", connectException)
         connectException.printStackTrace()
         try {
-            Log.i(TAG, "Closing Socket")
-            bluetoothSocket.close()
-            Log.i(TAG, "Closing Socket COMPLETE")
+            bluetoothSocket!!.close()
+            Log.i(TAG, "Socket Closed")
         } catch (closeException: IOException) {
-            Log.i(TAG, "IO Exception: Could not close")
             closeException.printStackTrace()
-            return "FAILED: Could not close socket"
         }
         Log.i(TAG, "FAILED: Could not open socket")
-        return "FAILED: Could not open socket"
     }
 
     // Manage the connection in a separate thread
-    val inputStream = bluetoothSocket.inputStream
-    val outputStream = bluetoothSocket.outputStream
-    return manageConnectedSocket(inputStream, outputStream)
+    val inputStream = bluetoothSocket!!.inputStream
+    val outputStream = bluetoothSocket!!.outputStream
+    manageConnectedSocket(inputStream, outputStream)
 }
 
 fun manageConnectedSocket(
     inputStream:InputStream,
     outputStream: OutputStream
-): String = runBlocking {
+) = runBlocking {
     val TAG = "manageConnectedSocket"
     Log.i(TAG, "manageConnectedSocket()")
     // Code to manage the connection in a separate thread
     launch{
-        val obdConnection = ObdDeviceConnection(inputStream, outputStream)
-        Log.i(TAG, "OBD Connection Secured")
-//        val response = obdConnection.run(RPMCommand())
-//        Log.i(TAG, "$response.value")
-    }
-    return@runBlocking "TEST COMPLETE"
+        try {
+            val obdConnection = ObdDeviceConnection(inputStream, outputStream)
+            Log.i(TAG, "OBD Connection Secured")
 
-//    // Example of writing data
-//    val message = "Hello, Bluetooth!"
-//    try {
-//        outputStream?.write(message.toByteArray())
-//    } catch (e: IOException) {
-//        e.printStackTrace()
-//    }
-//
-//    // Example of reading data
-//    val buffer = ByteArray(1024)
-//    var bytes: Int
-//    try {
-//        bytes = inputStream?.read(buffer) ?: 0
-//        val readMessage = String(buffer, 0, bytes)
-//        // Process the read message
-//    } catch (e: IOException) {
-//        e.printStackTrace()
-//    }
+            var response = obdConnection.run(ResetAdapterCommand())
+            var responseValue = response.value
+            Log.i(TAG, "Reset Adapter Command: $responseValue")
+
+            response = obdConnection.run(SelectProtocolCommand(ObdProtocols.AUTO))
+            responseValue = response.value
+            Log.i(TAG, "Select Protocol Command: $responseValue")
+
+            response = obdConnection.run(BypassInitializationCommand())
+            responseValue = response.value
+            Log.i(TAG, "Bypass Init Command: $responseValue")
+
+//            response = obdConnection.run().value
+//            var response2 = response.value
+//            Log.i(TAG, ": $response2")
+
+//            response = obdConnection.run(VINCommand()).value
+//            Log.i(TAG, "VIN Command: $response")
+
+//            response = obdConnection.run(SpeedCommand()).value
+//            Log.i(TAG, "Speed Command: $response")
+
+        }catch (obdException: RuntimeException){
+            obdException.printStackTrace()
+        }
+    }
+    return@runBlocking "Connection Tested"
 }

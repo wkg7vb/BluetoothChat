@@ -90,10 +90,10 @@ fun BluetoothDeviceList(
                     .clickable { onClick(device) }
                     .padding(16.dp)
             )
-            Button(onClick = { temp = createBluetoothConnection(device.address, bluetoothAdapter) }) {
-                Text(text = "Send Command")
+            Text(text = device.address)
+            Button(onClick = { createBluetoothConnection(device.address, bluetoothAdapter) }) {
+                Text(text = "Test Connection")
             }
-            Text(temp)
         }
 
 //        item {
