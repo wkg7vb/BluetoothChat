@@ -9,7 +9,9 @@ import android.content.Context
 import android.util.Log
 import com.github.eltonvs.obd.command.AdaptiveTimingMode
 import com.github.eltonvs.obd.command.BadResponseException
+import com.github.eltonvs.obd.command.ObdCommand
 import com.github.eltonvs.obd.command.ObdProtocols
+import com.github.eltonvs.obd.command.ObdRawResponse
 import com.github.eltonvs.obd.command.ObdResponse
 import com.github.eltonvs.obd.command.at.BypassInitializationCommand
 import com.github.eltonvs.obd.command.at.ResetAdapterCommand
@@ -99,27 +101,18 @@ fun manageConnectedSocket(
 
             var response = obdConnection.run(ResetAdapterCommand())
             var responseCommand = response.command.name
-            var responseValue = response.value
             var responseRaw = response.rawResponse
-            Log.i(TAG, "$responseCommand: $responseValue = $responseRaw")
+            Log.i(TAG, "$responseCommand: $responseRaw")
 
             response = obdConnection.run(SelectProtocolCommand(ObdProtocols.AUTO))
             responseCommand = response.command.name
-            responseValue = response.value
             responseRaw = response.rawResponse
-            Log.i(TAG, "$responseCommand: $responseValue = $responseRaw")
-
-            response = obdConnection.run(BypassInitializationCommand())
-            responseCommand = response.command.name
-            responseValue = response.value
-            responseRaw = response.rawResponse
-            Log.i(TAG, "$responseCommand: $responseValue = $responseRaw")
+            Log.i(TAG, "$responseCommand: $responseRaw")
 
             response = obdConnection.run(SpeedCommand())
             responseCommand = response.command.name
-            responseValue = response.value
             responseRaw = response.rawResponse
-            Log.i(TAG, "$responseCommand: $responseValue = $responseRaw")
+            Log.i(TAG, "$responseCommand: $responseRaw")
 
         }catch (obdException: RuntimeException){
             obdException.printStackTrace()
@@ -127,3 +120,15 @@ fun manageConnectedSocket(
     }
     return@runBlocking
 }
+
+//class PINCommand : ObdCommand() {
+//    // Required
+//    override val tag = "PIN_COMMAND"
+//    override val name = "PIN Command"
+//    override val mode = "12"
+//    override val pid = "34"
+//
+//    //Optional
+//    override val defaultUnit = ""
+//    override val handler = { it: ObdRawResponse -> "Calculations to parse value from ${it.processedValue}" }
+//}
