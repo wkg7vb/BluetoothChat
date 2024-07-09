@@ -19,6 +19,7 @@ import com.github.eltonvs.obd.command.at.SelectProtocolCommand
 import com.github.eltonvs.obd.command.at.SetAdaptiveTimingCommand
 import com.github.eltonvs.obd.command.control.VINCommand
 import com.github.eltonvs.obd.command.engine.RPMCommand
+import com.github.eltonvs.obd.command.engine.RelativeThrottlePositionCommand
 import com.github.eltonvs.obd.command.engine.SpeedCommand
 import com.github.eltonvs.obd.connection.ObdDeviceConnection
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -85,6 +86,7 @@ fun createBluetoothConnection(
     // Manage the connection in a separate thread
     val inputStream = bluetoothSocket!!.inputStream
     val outputStream = bluetoothSocket!!.outputStream
+    outputStream.write(1234)
     manageConnectedSocket(inputStream, outputStream)
 }
 
@@ -110,6 +112,11 @@ fun manageConnectedSocket(
             Log.i(TAG, "$responseCommand: $responseRaw")
 
             response = obdConnection.run(SpeedCommand())
+            responseCommand = response.command.name
+            responseRaw = response.rawResponse
+            Log.i(TAG, "$responseCommand: $responseRaw")
+
+            response = obdConnection.run(RelativeThrottlePositionCommand())
             responseCommand = response.command.name
             responseRaw = response.rawResponse
             Log.i(TAG, "$responseCommand: $responseRaw")
