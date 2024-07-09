@@ -60,12 +60,8 @@ fun createBluetoothConnection(
     // Create a BluetoothSocket
     var bluetoothSocket: BluetoothSocket? = null
     try {
-        Log.i(TAG,"Creating socket from UUID")
         bluetoothSocket = device.createRfcommSocketToServiceRecord(MY_UUID)
-//        bluetoothSocket = device.createInsecureRfcommSocketToServiceRecord(MY_UUID)
-        Log.i(TAG,"Creating socket from UUID COMPLETE")
     } catch (e: IOException) {
-        Log.i(TAG, "IO Exception: Could not create socket from UUID")
         e.printStackTrace()
     }
 
@@ -73,18 +69,15 @@ fun createBluetoothConnection(
 
     try {
         bluetoothSocket!!.connect()
-        Log.i(TAG, "Socket Open")
         // Connection successful
         // You can now manage your connection (in a separate thread)
     } catch (connectException: IOException) {
         connectException.printStackTrace()
         try {
             bluetoothSocket!!.close()
-            Log.i(TAG, "Socket Closed")
         } catch (closeException: IOException) {
             closeException.printStackTrace()
         }
-        Log.i(TAG, "FAILED: Could not open socket")
     }
 
     // Manage the connection in a separate thread
@@ -98,7 +91,6 @@ fun manageConnectedSocket(
     outputStream: OutputStream
 ) = runBlocking {
     val TAG = "manageConnectedSocket"
-    Log.i(TAG, "manageConnectedSocket()")
     // Code to manage the connection in a separate thread
     launch{
         try {
@@ -108,22 +100,26 @@ fun manageConnectedSocket(
             var response = obdConnection.run(ResetAdapterCommand())
             var responseCommand = response.command.name
             var responseValue = response.value
-            Log.i(TAG, "$responseCommand: $responseValue")
+            var responseRaw = response.rawResponse
+            Log.i(TAG, "$responseCommand: $responseValue = $responseRaw")
 
             response = obdConnection.run(SelectProtocolCommand(ObdProtocols.AUTO))
             responseCommand = response.command.name
             responseValue = response.value
-            Log.i(TAG, "$responseCommand: $responseValue")
+            responseRaw = response.rawResponse
+            Log.i(TAG, "$responseCommand: $responseValue = $responseRaw")
 
             response = obdConnection.run(BypassInitializationCommand())
             responseCommand = response.command.name
             responseValue = response.value
-            Log.i(TAG, "$responseCommand: $responseValue")
+            responseRaw = response.rawResponse
+            Log.i(TAG, "$responseCommand: $responseValue = $responseRaw")
 
-            response = obdConnection.run(BypassInitializationCommand())
+            response = obdConnection.run(SpeedCommand())
             responseCommand = response.command.name
             responseValue = response.value
-            Log.i(TAG, "$responseCommand: $responseValue")
+            responseRaw = response.rawResponse
+            Log.i(TAG, "$responseCommand: $responseValue = $responseRaw")
 
         }catch (obdException: RuntimeException){
             obdException.printStackTrace()
