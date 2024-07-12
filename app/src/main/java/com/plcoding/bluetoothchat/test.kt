@@ -28,6 +28,9 @@ import kotlinx.coroutines.runBlocking
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.sql.Timestamp
+import java.time.Instant
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 
@@ -106,13 +109,15 @@ fun manageConnectedSocket(
     var response: ObdResponse
     var responseCommand: String
     var responseRaw: ObdRawResponse
+    var timestamp: Timestamp
     // Code to manage the connection in a separate thread
     launch{
         try {
+            DateTimeFormatter.ISO_INSTANT.format(Instant.now())
             response = obdConnection.run(ResetAdapterCommand())
             responseCommand = response.command.name
             responseRaw = response.rawResponse
-            Log.i(TAG, "$responseCommand: $responseRaw")
+            Log.i(TAG, "$responseCommand: $responseRaw: $")
 
             response = obdConnection.run(SelectProtocolCommand(ObdProtocols.AUTO))
             responseCommand = response.command.name
@@ -137,11 +142,11 @@ fun manageConnectedSocket(
         }catch (obdException: RuntimeException){
             obdException.printStackTrace()
         }
-        try{
-
-        }catch (obdException: RuntimeException){
-            obdException.printStackTrace()
-        }
+//        try{
+//
+//        }catch (obdException: RuntimeException){
+//            obdException.printStackTrace()
+//        }
     }
     return@runBlocking
 }
