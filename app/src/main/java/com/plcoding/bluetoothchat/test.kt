@@ -109,44 +109,17 @@ fun manageConnectedSocket(
     var response: ObdResponse
     var responseCommand: String
     var responseRaw: ObdRawResponse
-    var timestamp: Timestamp
     // Code to manage the connection in a separate thread
     launch{
-        try {
-            DateTimeFormatter.ISO_INSTANT.format(Instant.now())
-            response = obdConnection.run(ResetAdapterCommand())
-            responseCommand = response.command.name
-            responseRaw = response.rawResponse
-            Log.i(TAG, "$responseCommand: $responseRaw: $")
-
-            response = obdConnection.run(SelectProtocolCommand(ObdProtocols.AUTO))
-            responseCommand = response.command.name
-            responseRaw = response.rawResponse
-            Log.i(TAG, "$responseCommand: $responseRaw")
-        }catch (obdException: RuntimeException){
-            obdException.printStackTrace()
-        }
         try{
+            Log.i(TAG, "Sending Speed Command")
             response = obdConnection.run(SpeedCommand())
             responseCommand = response.command.name
             responseRaw = response.rawResponse
             Log.i(TAG, "$responseCommand: $responseRaw")
         }catch (obdException: RuntimeException){
-            obdException.printStackTrace()
+            obdException.printStackTrace() // more detail here with log statements
         }
-        try{
-            response = obdConnection.run(RelativeThrottlePositionCommand())
-            responseCommand = response.command.name
-            responseRaw = response.rawResponse
-            Log.i(TAG, "$responseCommand: $responseRaw")
-        }catch (obdException: RuntimeException){
-            obdException.printStackTrace()
-        }
-//        try{
-//
-//        }catch (obdException: RuntimeException){
-//            obdException.printStackTrace()
-//        }
     }
     return@runBlocking
 }
