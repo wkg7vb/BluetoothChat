@@ -86,7 +86,13 @@ fun createBluetoothConnection(
     // Manage the connection in a separate thread
     val inputStream = bluetoothSocket!!.inputStream
     val outputStream = bluetoothSocket!!.outputStream
-    outputStream.write(1234)
+    
+//    try{
+//        outputStream.write(1234)
+//    } catch (writeException: IOException) {
+//        writeException.printStackTrace()
+//    }
+
     manageConnectedSocket(inputStream, outputStream)
 }
 
@@ -95,31 +101,43 @@ fun manageConnectedSocket(
     outputStream: OutputStream
 ) = runBlocking {
     val TAG = "manageConnectedSocket"
+
+    val obdConnection = ObdDeviceConnection(inputStream, outputStream)
+    var response: ObdResponse
+    var responseCommand: String
+    var responseRaw: ObdRawResponse
     // Code to manage the connection in a separate thread
     launch{
         try {
-            val obdConnection = ObdDeviceConnection(inputStream, outputStream)
-            Log.i(TAG, "OBD Connection Secured")
-
-            var response = obdConnection.run(ResetAdapterCommand())
-            var responseCommand = response.command.name
-            var responseRaw = response.rawResponse
+            response = obdConnection.run(ResetAdapterCommand())
+            responseCommand = response.command.name
+            responseRaw = response.rawResponse
             Log.i(TAG, "$responseCommand: $responseRaw")
 
             response = obdConnection.run(SelectProtocolCommand(ObdProtocols.AUTO))
             responseCommand = response.command.name
             responseRaw = response.rawResponse
             Log.i(TAG, "$responseCommand: $responseRaw")
-
+        }catch (obdException: RuntimeException){
+            obdException.printStackTrace()
+        }
+        try{
             response = obdConnection.run(SpeedCommand())
             responseCommand = response.command.name
             responseRaw = response.rawResponse
             Log.i(TAG, "$responseCommand: $responseRaw")
-
+        }catch (obdException: RuntimeException){
+            obdException.printStackTrace()
+        }
+        try{
             response = obdConnection.run(RelativeThrottlePositionCommand())
             responseCommand = response.command.name
             responseRaw = response.rawResponse
             Log.i(TAG, "$responseCommand: $responseRaw")
+        }catch (obdException: RuntimeException){
+            obdException.printStackTrace()
+        }
+        try{
 
         }catch (obdException: RuntimeException){
             obdException.printStackTrace()
