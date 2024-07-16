@@ -188,6 +188,16 @@ fun manageConnectedSocket(
         } catch (obdException: RuntimeException) {
             obdException.printStackTrace() // more detail here with log statements
         }
+        try {
+            Log.i(TAG, "Sending AT LP Command")
+            response = obdConnection.run(ATLPCommand())
+            responseCommand = response.command.name
+            responseRaw = response.rawResponse
+            Log.i(TAG, "$responseCommand: $responseRaw")
+        } catch (obdException: RuntimeException) {
+            obdException.printStackTrace() // more detail here with log statements
+        }
+
     }
     return@runBlocking
 }
@@ -232,3 +242,16 @@ class PID0120Command : ObdCommand() {
     }
 }
 
+class ATLPCommand : ObdCommand() {
+    // Required
+    override val tag = "AT_LP_COMMAND"
+    override val name = "AT LP Command"
+    override val mode = "AT"
+    override val pid = "LP"
+
+    //Optional
+    override val defaultUnit = ""
+    override val handler = { it: ObdRawResponse ->
+        "Calculations to parse value from ${it.processedValue}"
+    }
+}
