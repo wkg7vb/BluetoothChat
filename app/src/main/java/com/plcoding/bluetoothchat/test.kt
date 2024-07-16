@@ -168,8 +168,8 @@ fun manageConnectedSocket(
     // Code to manage the connection in a separate thread
     launch {
         try {
-            Log.i(TAG, "Sending CustomCommand")
-            response = obdConnection.run(CustomCommand())
+            Log.i(TAG, "Sending Custom Command")
+            response = obdConnection.run(MonitorAllCommand())
             responseCommand = response.command.name
             responseRaw = response.rawResponse
             Log.i(TAG, "$responseCommand: $responseRaw")
@@ -820,6 +820,18 @@ class CANSilentMonitoringOnCommand : ObdCommand() {
     override val name = "CAN Silent Monitoring On Command"
     override val mode = "AT"
     override val pid = "CSM1"
+
+    //Optional
+    override val defaultUnit = ""
+    override val handler = { it: ObdRawResponse -> "Calculations to parse value from ${it.processedValue}" }
+}
+
+class MonitorAllCommand : ObdCommand() {
+    // Required
+    override val tag = "MONITOR_ALL_COMMAND"
+    override val name = "Monitor All Command"
+    override val mode = "AT"
+    override val pid = "MA"
 
     //Optional
     override val defaultUnit = ""
