@@ -32,6 +32,7 @@ import com.github.eltonvs.obd.command.at.SetSpacesCommand
 import com.github.eltonvs.obd.command.at.SetTimeoutCommand
 import com.github.eltonvs.obd.command.at.SlowInitiationCommand
 import com.github.eltonvs.obd.command.at.WarmStartCommand
+import com.github.eltonvs.obd.command.bytesToInt
 import com.github.eltonvs.obd.command.control.AvailablePIDsCommand
 import com.github.eltonvs.obd.command.control.BaseMonitorStatus
 import com.github.eltonvs.obd.command.control.BaseTroubleCodesCommand
@@ -78,6 +79,7 @@ import com.github.eltonvs.obd.command.temperature.EngineCoolantTemperatureComman
 import com.github.eltonvs.obd.command.temperature.OilTemperatureCommand
 import com.github.eltonvs.obd.connection.ObdDeviceConnection
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.IOException
@@ -168,8 +170,18 @@ fun manageConnectedSocket(
     // Code to manage the connection in a separate thread
     launch {
         try {
-            Log.i(TAG, "Sending Custom Command")
-            response = obdConnection.run(MonitorAllCommand())
+            Log.i(TAG, "Sending AT Z Command")
+            response = obdConnection.run(ATZCommand())
+            responseCommand = response.command.name
+            responseRaw = response.rawResponse
+            Log.i(TAG, "$responseCommand: $responseRaw")
+        } catch (obdException: RuntimeException) {
+            obdException.printStackTrace() // more detail here with log statements
+        }
+        delay(5000)
+        try {
+            Log.i(TAG, "Sending PID 01-20 Command")
+            response = obdConnection.run(PID0120Command())
             responseCommand = response.command.name
             responseRaw = response.rawResponse
             Log.i(TAG, "$responseCommand: $responseRaw")
@@ -180,14 +192,43 @@ fun manageConnectedSocket(
     return@runBlocking
 }
 
-class Speed Command : ObdCommand() {
+class CustomCommand : ObdCommand() {
     // Required
     override val tag = "CUSTOM_COMMAND"
     override val name = "Custom Command"
-    override val mode = "AT"
-    override val pid = "Hello World!"
+    override val mode = "FF"
+    override val pid = "FF"
 
     //Optional
     override val defaultUnit = ""
     override val handler = { it: ObdRawResponse -> "Calculations to parse value from ${it.processedValue}" }
 }
+
+class ATZCommand : ObdCommand() {
+    // Required
+    override val tag = "AT_Z_COMMAND"
+    override val name = "AT Z Command"
+    override val mode = "AT"
+    override val pid = "Z"
+
+    //Optional
+    override val defaultUnit = ""
+    override val handler = { it: ObdRawResponse ->
+        "Calculations to parse value from ${it.processedValue}"
+    }
+}
+
+class PID0120Command : ObdCommand() {
+    // Required
+    override val tag = "PID_01_20_COMMAND"
+    override val name = "PID 01-20 Command"
+    override val mode = "01"
+    override val pid = "00"
+
+    //Optional
+    override val defaultUnit = ""
+    override val handler = { it: ObdRawResponse ->
+        "Calculations to parse value from ${it.processedValue}"
+    }
+}
+
