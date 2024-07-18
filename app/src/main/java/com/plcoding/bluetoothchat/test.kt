@@ -226,9 +226,6 @@ class ATZCommand : ObdCommand() {
     override val handler = { it: ObdRawResponse ->
         "Calculations to parse value from ${it.processedValue}"
     }
-
-    override val rawCommand: String
-        get() = listOf(mode, pid).joinToString("")
 }
 
 class PID0120Command : ObdCommand() {
