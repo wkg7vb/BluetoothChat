@@ -170,34 +170,14 @@ fun manageConnectedSocket(
     // Code to manage the connection in a separate thread
     launch {
         try {
-            Log.i(TAG, "Sending AT Z Command")
-            response = obdConnection.run(ATZCommand())
+            Log.i(TAG, "Sending Test Command")
+            response = obdConnection.run(TestCommand())
             responseCommand = response.command.name
             responseRaw = response.rawResponse
             Log.i(TAG, "$responseCommand: $responseRaw")
         } catch (obdException: RuntimeException) {
             obdException.printStackTrace() // more detail here with log statements
         }
-        delay(5000)
-        try {
-            Log.i(TAG, "Sending PID 01-20 Command")
-            response = obdConnection.run(PID0120Command())
-            responseCommand = response.command.name
-            responseRaw = response.rawResponse
-            Log.i(TAG, "$responseCommand: $responseRaw")
-        } catch (obdException: RuntimeException) {
-            obdException.printStackTrace() // more detail here with log statements
-        }
-        try {
-            Log.i(TAG, "Sending AT LP Command")
-            response = obdConnection.run(ATLPCommand())
-            responseCommand = response.command.name
-            responseRaw = response.rawResponse
-            Log.i(TAG, "$responseCommand: $responseRaw")
-        } catch (obdException: RuntimeException) {
-            obdException.printStackTrace() // more detail here with log statements
-        }
-
     }
     return@runBlocking
 }
@@ -214,40 +194,15 @@ class CustomCommand : ObdCommand() {
     override val handler = { it: ObdRawResponse -> "Calculations to parse value from ${it.processedValue}" }
 }
 
-class ATZCommand : ObdCommand() {
-    // Required
-    override val tag = "AT_Z_COMMAND"
-    override val name = "AT Z Command"
-    override val mode = "AT"
-    override val pid = "Z"
-
-    //Optional
-    override val defaultUnit = ""
-    override val handler = { it: ObdRawResponse ->
-        "Calculations to parse value from ${it.processedValue}"
-    }
-}
-
-class PID0120Command : ObdCommand() {
+class TestCommand : ObdCommand() {
     // Required
     override val tag = "PID_01_20_COMMAND"
     override val name = "PID 01-20 Command"
     override val mode = "01"
     override val pid = "00"
 
-    //Optional
-    override val defaultUnit = ""
-    override val handler = { it: ObdRawResponse ->
-        "Calculations to parse value from ${it.processedValue}"
-    }
-}
-
-class ATLPCommand : ObdCommand() {
-    // Required
-    override val tag = "AT_LP_COMMAND"
-    override val name = "AT LP Command"
-    override val mode = "AT"
-    override val pid = "LP"
+//    override val rawCommand: String
+//        get() = listOf(mode, pid).joinToString("")
 
     //Optional
     override val defaultUnit = ""
