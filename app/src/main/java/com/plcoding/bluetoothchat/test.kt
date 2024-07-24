@@ -8,6 +8,15 @@ import android.util.Log
 import com.plcoding.bluetoothchat.kotlinapi.command.ObdCommand
 import com.plcoding.bluetoothchat.kotlinapi.command.ObdRawResponse
 import com.plcoding.bluetoothchat.kotlinapi.command.ObdResponse
+import com.plcoding.bluetoothchat.kotlinapi.command.at.ATAT0Command
+import com.plcoding.bluetoothchat.kotlinapi.command.at.ATE0Command
+import com.plcoding.bluetoothchat.kotlinapi.command.at.ATL0Command
+import com.plcoding.bluetoothchat.kotlinapi.command.at.ATS0Command
+import com.plcoding.bluetoothchat.kotlinapi.command.at.ATSP0Command
+import com.plcoding.bluetoothchat.kotlinapi.command.at.ResetAdapterCommand
+import com.plcoding.bluetoothchat.kotlinapi.command.control.AvailablePIDsCommand
+import com.plcoding.bluetoothchat.kotlinapi.command.control.VINCommand
+import com.plcoding.bluetoothchat.kotlinapi.command.engine.SpeedCommand
 import com.plcoding.bluetoothchat.kotlinapi.connection.ObdDeviceConnection
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -96,8 +105,111 @@ fun manageConnectedSocket(
     // Code to manage the connection in a separate thread
     launch {
         try {
-            Log.i(TAG, "Sending Test Command")
-            response = obdConnection.run(TestCommand())
+            response = obdConnection.run(ResetAdapterCommand())
+            responseCommand = response.command.name
+            responseRaw = response.rawResponse
+            Log.i(TAG, "$responseCommand: $responseRaw")
+        } catch (obdException: RuntimeException) {
+            obdException.printStackTrace() // more detail here with log statements
+        }
+        try {
+            response = obdConnection.run(ATE0Command())
+            responseCommand = response.command.name
+            responseRaw = response.rawResponse
+            Log.i(TAG, "$responseCommand: $responseRaw")
+        } catch (obdException: RuntimeException) {
+            obdException.printStackTrace() // more detail here with log statements
+        }
+        try {
+            response = obdConnection.run(ATL0Command())
+            responseCommand = response.command.name
+            responseRaw = response.rawResponse
+            Log.i(TAG, "$responseCommand: $responseRaw")
+        } catch (obdException: RuntimeException) {
+            obdException.printStackTrace() // more detail here with log statements
+        }
+        try {
+            response = obdConnection.run(ATS0Command())
+            responseCommand = response.command.name
+            responseRaw = response.rawResponse
+            Log.i(TAG, "$responseCommand: $responseRaw")
+        } catch (obdException: RuntimeException) {
+            obdException.printStackTrace() // more detail here with log statements
+        }
+        try {
+            response = obdConnection.run(ATAT0Command())
+            responseCommand = response.command.name
+            responseRaw = response.rawResponse
+            Log.i(TAG, "$responseCommand: $responseRaw")
+        } catch (obdException: RuntimeException) {
+            obdException.printStackTrace() // more detail here with log statements
+        }
+        try {
+            response = obdConnection.run(ATSP0Command())
+            responseCommand = response.command.name
+            responseRaw = response.rawResponse
+            Log.i(TAG, "$responseCommand: $responseRaw")
+        } catch (obdException: RuntimeException) {
+            obdException.printStackTrace() // more detail here with log statements
+        }
+        try {
+            response = obdConnection.run(ATS0Command())
+            responseCommand = response.command.name
+            responseRaw = response.rawResponse
+            Log.i(TAG, "$responseCommand: $responseRaw")
+        } catch (obdException: RuntimeException) {
+            obdException.printStackTrace() // more detail here with log statements
+        }
+        try {
+            response = obdConnection.run(AvailablePIDsCommand(AvailablePIDsCommand.AvailablePIDsRanges.PIDS_01_TO_20))
+            responseCommand = response.command.name
+            responseRaw = response.rawResponse
+            Log.i(TAG, "$responseCommand: $responseRaw")
+        } catch (obdException: RuntimeException) {
+            obdException.printStackTrace() // more detail here with log statements
+        }
+        try {
+            response = obdConnection.run(AvailablePIDsCommand(AvailablePIDsCommand.AvailablePIDsRanges.PIDS_21_TO_40))
+            responseCommand = response.command.name
+            responseRaw = response.rawResponse
+            Log.i(TAG, "$responseCommand: $responseRaw")
+        } catch (obdException: RuntimeException) {
+            obdException.printStackTrace() // more detail here with log statements
+        }
+        try {
+            response = obdConnection.run(AvailablePIDsCommand(AvailablePIDsCommand.AvailablePIDsRanges.PIDS_41_TO_60))
+            responseCommand = response.command.name
+            responseRaw = response.rawResponse
+            Log.i(TAG, "$responseCommand: $responseRaw")
+        } catch (obdException: RuntimeException) {
+            obdException.printStackTrace() // more detail here with log statements
+        }
+        try {
+            response = obdConnection.run(AvailablePIDsCommand(AvailablePIDsCommand.AvailablePIDsRanges.PIDS_61_TO_80))
+            responseCommand = response.command.name
+            responseRaw = response.rawResponse
+            Log.i(TAG, "$responseCommand: $responseRaw")
+        } catch (obdException: RuntimeException) {
+            obdException.printStackTrace() // more detail here with log statements
+        }
+        try {
+            response = obdConnection.run(AvailablePIDsCommand(AvailablePIDsCommand.AvailablePIDsRanges.PIDS_01_TO_20))
+            responseCommand = response.command.name
+            responseRaw = response.rawResponse
+            Log.i(TAG, "$responseCommand: $responseRaw")
+        } catch (obdException: RuntimeException) {
+            obdException.printStackTrace() // more detail here with log statements
+        }
+        try {
+            response = obdConnection.run(SpeedCommand())
+            responseCommand = response.command.name
+            responseRaw = response.rawResponse
+            Log.i(TAG, "$responseCommand: $responseRaw")
+        } catch (obdException: RuntimeException) {
+            obdException.printStackTrace() // more detail here with log statements
+        }
+        try {
+            response = obdConnection.run(VINCommand())
             responseCommand = response.command.name
             responseRaw = response.rawResponse
             Log.i(TAG, "$responseCommand: $responseRaw")
@@ -118,21 +230,4 @@ class CustomCommand : ObdCommand() {
     //Optional
     override val defaultUnit = ""
     override val handler = { it: ObdRawResponse -> "Calculations to parse value from ${it.processedValue}" }
-}
-
-class TestCommand : ObdCommand() {
-    // Required
-    override val tag = "PID_01_20_COMMAND"
-    override val name = "PID 01-20 Command"
-    override val mode = "01"
-    override val pid = "00"
-
-//    override val rawCommand: String
-//        get() = listOf(mode, pid).joinToString("")
-
-    //Optional
-    override val defaultUnit = ""
-    override val handler = { it: ObdRawResponse ->
-        "Calculations to parse value from ${it.processedValue}"
-    }
 }

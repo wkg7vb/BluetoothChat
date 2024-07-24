@@ -44,3 +44,33 @@ class ProtocolCloseCommand : ATCommand() {
     override val name = "OBD Protocol Close"
     override val pid = "PC"
 }
+
+class ATE0Command : ATCommand() {
+    override val tag = "ATE0"
+    override val name = "ATE0"
+    override val pid = "E0"
+}
+
+class ATL0Command : ATCommand() {
+    override val tag = "ATL0"
+    override val name = "ATL0"
+    override val pid = "L0"
+}
+
+class ATS0Command : ATCommand() {
+    override val tag = "ATS0"
+    override val name = "ATS0"
+    override val pid = "S0"
+}
+
+class ATAT0Command : ATCommand() {
+    override val tag = "AT0"
+    override val name = "AT0"
+    override val pid = "AT0"
+}
+
+class ATSP0Command : ATCommand() {
+    override val tag = "ATSP0"
+    override val name = "ATSP0"
+    override val pid = "SP0"
+}
