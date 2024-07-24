@@ -57,10 +57,10 @@ class ATL0Command : ATCommand() {
     override val pid = "L0"
 }
 
-class ATS0Command : ATCommand() {
-    override val tag = "ATS0"
-    override val name = "ATS0"
-    override val pid = "S0"
+class ATS1Command : ATCommand() {
+    override val tag = "ATS1"
+    override val name = "ATS1"
+    override val pid = "S1"
 }
 
 class ATAT0Command : ATCommand() {

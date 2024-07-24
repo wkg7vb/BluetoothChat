@@ -11,7 +11,7 @@ import com.plcoding.bluetoothchat.kotlinapi.command.ObdResponse
 import com.plcoding.bluetoothchat.kotlinapi.command.at.ATAT0Command
 import com.plcoding.bluetoothchat.kotlinapi.command.at.ATE0Command
 import com.plcoding.bluetoothchat.kotlinapi.command.at.ATL0Command
-import com.plcoding.bluetoothchat.kotlinapi.command.at.ATS0Command
+import com.plcoding.bluetoothchat.kotlinapi.command.at.ATS1Command
 import com.plcoding.bluetoothchat.kotlinapi.command.at.ATSP0Command
 import com.plcoding.bluetoothchat.kotlinapi.command.at.ResetAdapterCommand
 import com.plcoding.bluetoothchat.kotlinapi.command.control.AvailablePIDsCommand
@@ -66,13 +66,13 @@ fun createBluetoothConnection(
     bluetoothAdapter.cancelDiscovery()
 
     try {
-        bluetoothSocket!!.connect()
+        bluetoothSocket?.connect()
         // Connection successful
         // You can now manage your connection (in a separate thread)
     } catch (connectException: IOException) {
         connectException.printStackTrace()
         try {
-            bluetoothSocket!!.close()
+            bluetoothSocket?.close()
         } catch (closeException: IOException) {
             closeException.printStackTrace()
         }
@@ -110,7 +110,8 @@ fun manageConnectedSocket(
             responseRaw = response.rawResponse
             Log.i(TAG, "$responseCommand: $responseRaw")
         } catch (obdException: RuntimeException) {
-            obdException.printStackTrace() // more detail here with log statements
+            //obdException.printStackTrace()
+            Log.i(TAG, "ResetAdapterCommand: FAILED")
         }
         try {
             response = obdConnection.run(ATE0Command())
@@ -118,7 +119,8 @@ fun manageConnectedSocket(
             responseRaw = response.rawResponse
             Log.i(TAG, "$responseCommand: $responseRaw")
         } catch (obdException: RuntimeException) {
-            obdException.printStackTrace() // more detail here with log statements
+            //obdException.printStackTrace()
+            Log.i(TAG, "ATE0Command: FAILED")
         }
         try {
             response = obdConnection.run(ATL0Command())
@@ -126,15 +128,17 @@ fun manageConnectedSocket(
             responseRaw = response.rawResponse
             Log.i(TAG, "$responseCommand: $responseRaw")
         } catch (obdException: RuntimeException) {
-            obdException.printStackTrace() // more detail here with log statements
+            //obdException.printStackTrace()
+            Log.i(TAG, "ATL0Command: FAILED")
         }
         try {
-            response = obdConnection.run(ATS0Command())
+            response = obdConnection.run(ATS1Command())
             responseCommand = response.command.name
             responseRaw = response.rawResponse
             Log.i(TAG, "$responseCommand: $responseRaw")
         } catch (obdException: RuntimeException) {
-            obdException.printStackTrace() // more detail here with log statements
+            //obdException.printStackTrace()
+            Log.i(TAG, "ATS1Command: FAILED")
         }
         try {
             response = obdConnection.run(ATAT0Command())
@@ -142,7 +146,8 @@ fun manageConnectedSocket(
             responseRaw = response.rawResponse
             Log.i(TAG, "$responseCommand: $responseRaw")
         } catch (obdException: RuntimeException) {
-            obdException.printStackTrace() // more detail here with log statements
+            //obdException.printStackTrace()
+            Log.i(TAG, "ATAT0Command: FAILED")
         }
         try {
             response = obdConnection.run(ATSP0Command())
@@ -150,15 +155,8 @@ fun manageConnectedSocket(
             responseRaw = response.rawResponse
             Log.i(TAG, "$responseCommand: $responseRaw")
         } catch (obdException: RuntimeException) {
-            obdException.printStackTrace() // more detail here with log statements
-        }
-        try {
-            response = obdConnection.run(ATS0Command())
-            responseCommand = response.command.name
-            responseRaw = response.rawResponse
-            Log.i(TAG, "$responseCommand: $responseRaw")
-        } catch (obdException: RuntimeException) {
-            obdException.printStackTrace() // more detail here with log statements
+            //obdException.printStackTrace()
+            Log.i(TAG, "ATSP0Command: FAILED")
         }
         try {
             response = obdConnection.run(AvailablePIDsCommand(AvailablePIDsCommand.AvailablePIDsRanges.PIDS_01_TO_20))
@@ -166,7 +164,8 @@ fun manageConnectedSocket(
             responseRaw = response.rawResponse
             Log.i(TAG, "$responseCommand: $responseRaw")
         } catch (obdException: RuntimeException) {
-            obdException.printStackTrace() // more detail here with log statements
+            //obdException.printStackTrace()
+            Log.i(TAG, "AvailablePIDsCommand 1: FAILED")
         }
         try {
             response = obdConnection.run(AvailablePIDsCommand(AvailablePIDsCommand.AvailablePIDsRanges.PIDS_21_TO_40))
@@ -174,7 +173,8 @@ fun manageConnectedSocket(
             responseRaw = response.rawResponse
             Log.i(TAG, "$responseCommand: $responseRaw")
         } catch (obdException: RuntimeException) {
-            obdException.printStackTrace() // more detail here with log statements
+            //obdException.printStackTrace()
+            Log.i(TAG, "AvailablePIDsCommand 2: FAILED")
         }
         try {
             response = obdConnection.run(AvailablePIDsCommand(AvailablePIDsCommand.AvailablePIDsRanges.PIDS_41_TO_60))
@@ -182,7 +182,8 @@ fun manageConnectedSocket(
             responseRaw = response.rawResponse
             Log.i(TAG, "$responseCommand: $responseRaw")
         } catch (obdException: RuntimeException) {
-            obdException.printStackTrace() // more detail here with log statements
+            //obdException.printStackTrace()
+            Log.i(TAG, "AvailablePIDsCommand 3: FAILED")
         }
         try {
             response = obdConnection.run(AvailablePIDsCommand(AvailablePIDsCommand.AvailablePIDsRanges.PIDS_61_TO_80))
@@ -190,7 +191,8 @@ fun manageConnectedSocket(
             responseRaw = response.rawResponse
             Log.i(TAG, "$responseCommand: $responseRaw")
         } catch (obdException: RuntimeException) {
-            obdException.printStackTrace() // more detail here with log statements
+            //obdException.printStackTrace()
+            Log.i(TAG, "AvailablePIDsCommand 4: FAILED")
         }
         try {
             response = obdConnection.run(AvailablePIDsCommand(AvailablePIDsCommand.AvailablePIDsRanges.PIDS_81_TO_A0))
@@ -198,7 +200,8 @@ fun manageConnectedSocket(
             responseRaw = response.rawResponse
             Log.i(TAG, "$responseCommand: $responseRaw")
         } catch (obdException: RuntimeException) {
-            obdException.printStackTrace() // more detail here with log statements
+            //obdException.printStackTrace()
+            Log.i(TAG, "AvailablePIDsCommand 5: FAILED")
         }
         try {
             response = obdConnection.run(SpeedCommand())
@@ -206,7 +209,8 @@ fun manageConnectedSocket(
             responseRaw = response.rawResponse
             Log.i(TAG, "$responseCommand: $responseRaw")
         } catch (obdException: RuntimeException) {
-            obdException.printStackTrace() // more detail here with log statements
+            //obdException.printStackTrace()
+            Log.i(TAG, "SpeedCommand: FAILED")
         }
         try {
             response = obdConnection.run(VINCommand())
@@ -214,7 +218,8 @@ fun manageConnectedSocket(
             responseRaw = response.rawResponse
             Log.i(TAG, "$responseCommand: $responseRaw")
         } catch (obdException: RuntimeException) {
-            obdException.printStackTrace() // more detail here with log statements
+            //obdException.printStackTrace()
+            Log.i(TAG, "VINCommand: FAILED")
         }
     }
     return@runBlocking
