@@ -25,7 +25,7 @@ class ObdDeviceConnection(
         command: ObdCommand,
         useCache: Boolean = false,
         delayTime: Long = 0,
-        maxRetries: Int = 50, //default 5
+        maxRetries: Int = 5, //default 5
     ): ObdResponse = runBlocking {
         val obdRawResponse =
             if (useCache && responseCache[command] != null) {
@@ -81,7 +81,7 @@ class ObdDeviceConnection(
                     res.append(c)
                 } else {
                     retriesCount += 1
-                    delay(1) //default 500
+                    delay(500) //default 500
                 }
             }
             removeAll(SEARCHING_PATTERN, res.toString()).trim()

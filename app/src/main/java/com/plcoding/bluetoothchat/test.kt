@@ -179,7 +179,7 @@ fun manageConnectedSocket(
         var tpFail:Double = 0.00
         var rtpFail:Double = 0.00
         var duration = measureTimeMillis{
-            repeat(250) {
+            repeat(50) {
                 try {
                     response = obdConnection.run(SpeedCommand())
                     responseCommand = response.command.name
