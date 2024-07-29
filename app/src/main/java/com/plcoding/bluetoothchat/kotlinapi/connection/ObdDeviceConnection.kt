@@ -5,6 +5,7 @@ import com.plcoding.bluetoothchat.kotlinapi.command.ObdRawResponse
 import com.plcoding.bluetoothchat.kotlinapi.command.ObdResponse
 import com.plcoding.bluetoothchat.kotlinapi.command.RegexPatterns.SEARCHING_PATTERN
 import com.plcoding.bluetoothchat.kotlinapi.command.removeAll
+import com.plcoding.bluetoothchat.toFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -24,7 +25,7 @@ class ObdDeviceConnection(
         command: ObdCommand,
         useCache: Boolean = false,
         delayTime: Long = 0,
-        maxRetries: Int = 5,
+        maxRetries: Int = 50, //default 5
     ): ObdResponse = runBlocking {
         val obdRawResponse =
             if (useCache && responseCache[command] != null) {
@@ -63,7 +64,7 @@ class ObdDeviceConnection(
         var b: Byte
         var c: Char
         val res = StringBuffer()
-        var retriesCount = 0
+        var retriesCount = 5
 
         withContext(Dispatchers.IO) {
             // read until '>' arrives OR end of stream reached (-1)
@@ -80,7 +81,7 @@ class ObdDeviceConnection(
                     res.append(c)
                 } else {
                     retriesCount += 1
-                    delay(500)
+                    delay(1) //default 500
                 }
             }
             removeAll(SEARCHING_PATTERN, res.toString()).trim()

@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.util.Log
+import android.widget.Chronometer
 import com.plcoding.bluetoothchat.kotlinapi.command.ObdCommand
 import com.plcoding.bluetoothchat.kotlinapi.command.ObdRawResponse
 import com.plcoding.bluetoothchat.kotlinapi.command.ObdResponse
@@ -16,14 +17,20 @@ import com.plcoding.bluetoothchat.kotlinapi.command.at.ATSP0Command
 import com.plcoding.bluetoothchat.kotlinapi.command.at.ResetAdapterCommand
 import com.plcoding.bluetoothchat.kotlinapi.command.control.AvailablePIDsCommand
 import com.plcoding.bluetoothchat.kotlinapi.command.control.VINCommand
+import com.plcoding.bluetoothchat.kotlinapi.command.engine.RPMCommand
+import com.plcoding.bluetoothchat.kotlinapi.command.engine.RelativeThrottlePositionCommand
 import com.plcoding.bluetoothchat.kotlinapi.command.engine.SpeedCommand
+import com.plcoding.bluetoothchat.kotlinapi.command.engine.ThrottlePositionCommand
 import com.plcoding.bluetoothchat.kotlinapi.connection.ObdDeviceConnection
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.UUID
+import kotlin.system.measureTimeMillis
 
 
 // UUID for SPP (Serial Port Profile)
@@ -158,69 +165,102 @@ fun manageConnectedSocket(
             //obdException.printStackTrace()
             Log.i(TAG, "ATSP0Command: FAILED")
         }
-        try {
-            response = obdConnection.run(AvailablePIDsCommand(AvailablePIDsCommand.AvailablePIDsRanges.PIDS_01_TO_20))
-            responseCommand = response.command.name
-            responseRaw = response.rawResponse
-            Log.i(TAG, "$responseCommand: $responseRaw")
-        } catch (obdException: RuntimeException) {
-            //obdException.printStackTrace()
-            Log.i(TAG, "AvailablePIDsCommand 1: FAILED")
+//        outputStream.write("ATZ ATE0 ATL0 ATS1 ATAT0 ATSP0".toByteArray())
+//        outputStream.flush()
+//        inputStream.toFile("testFile.txt")
+        var successes:Double = 0.00
+        var speedSucc:Double = 0.00
+        var rpmSucc:Double = 0.00
+        var tpSucc:Double = 0.00
+        var rtpSucc:Double = 0.00
+        var failures:Double = 0.00
+        var speedFail:Double = 0.00
+        var rpmFail:Double = 0.00
+        var tpFail:Double = 0.00
+        var rtpFail:Double = 0.00
+        var duration = measureTimeMillis{
+            repeat(250) {
+                try {
+                    response = obdConnection.run(SpeedCommand())
+                    responseCommand = response.command.name
+                    responseRaw = response.rawResponse
+                    Log.i(TAG, "$responseCommand: $responseRaw")
+                    successes++
+                    speedSucc++
+                } catch (obdException: RuntimeException) {
+                    //obdException.printStackTrace()
+                    Log.i(TAG, "Speed Command: FAILED")
+                    failures++
+                    speedFail++
+                }
+                try {
+                    response = obdConnection.run(RPMCommand())
+                    responseCommand = response.command.name
+                    responseRaw = response.rawResponse
+                    Log.i(TAG, "$responseCommand: $responseRaw")
+                    successes++
+                    rpmSucc++
+                } catch (obdException: RuntimeException) {
+                    //obdException.printStackTrace()
+                    Log.i(TAG, "RPM Command: FAILED")
+                    failures++
+                    rpmFail++
+                }
+                try {
+                    response = obdConnection.run(ThrottlePositionCommand())
+                    responseCommand = response.command.name
+                    responseRaw = response.rawResponse
+                    Log.i(TAG, "$responseCommand: $responseRaw")
+                    successes++
+                    tpSucc++
+                } catch (obdException: RuntimeException) {
+                    //obdException.printStackTrace()
+                    Log.i(TAG, "Throttle Position Command: FAILED")
+                    failures++
+                    tpFail++
+                }
+                try {
+                    response = obdConnection.run(RelativeThrottlePositionCommand())
+                    responseCommand = response.command.name
+                    responseRaw = response.rawResponse
+                    Log.i(TAG, "$responseCommand: $responseRaw")
+                    successes++
+                    rtpSucc++
+                } catch (obdException: RuntimeException) {
+                    //obdException.printStackTrace()
+                    Log.i(TAG, "Relative Throttle Position Command: FAILED")
+                    failures++
+                    rtpFail++
+                }
+//                  outputStream.write("010D 010C 0111 0145".toByteArray())
+//                  outputStream.flush()
+//                  inputStream.toFile("testFile.txt")
+            }
         }
-        try {
-            response = obdConnection.run(AvailablePIDsCommand(AvailablePIDsCommand.AvailablePIDsRanges.PIDS_21_TO_40))
-            responseCommand = response.command.name
-            responseRaw = response.rawResponse
-            Log.i(TAG, "$responseCommand: $responseRaw")
-        } catch (obdException: RuntimeException) {
-            //obdException.printStackTrace()
-            Log.i(TAG, "AvailablePIDsCommand 2: FAILED")
-        }
-        try {
-            response = obdConnection.run(AvailablePIDsCommand(AvailablePIDsCommand.AvailablePIDsRanges.PIDS_41_TO_60))
-            responseCommand = response.command.name
-            responseRaw = response.rawResponse
-            Log.i(TAG, "$responseCommand: $responseRaw")
-        } catch (obdException: RuntimeException) {
-            //obdException.printStackTrace()
-            Log.i(TAG, "AvailablePIDsCommand 3: FAILED")
-        }
-        try {
-            response = obdConnection.run(AvailablePIDsCommand(AvailablePIDsCommand.AvailablePIDsRanges.PIDS_61_TO_80))
-            responseCommand = response.command.name
-            responseRaw = response.rawResponse
-            Log.i(TAG, "$responseCommand: $responseRaw")
-        } catch (obdException: RuntimeException) {
-            //obdException.printStackTrace()
-            Log.i(TAG, "AvailablePIDsCommand 4: FAILED")
-        }
-        try {
-            response = obdConnection.run(AvailablePIDsCommand(AvailablePIDsCommand.AvailablePIDsRanges.PIDS_81_TO_A0))
-            responseCommand = response.command.name
-            responseRaw = response.rawResponse
-            Log.i(TAG, "$responseCommand: $responseRaw")
-        } catch (obdException: RuntimeException) {
-            //obdException.printStackTrace()
-            Log.i(TAG, "AvailablePIDsCommand 5: FAILED")
-        }
-        try {
-            response = obdConnection.run(SpeedCommand())
-            responseCommand = response.command.name
-            responseRaw = response.rawResponse
-            Log.i(TAG, "$responseCommand: $responseRaw")
-        } catch (obdException: RuntimeException) {
-            //obdException.printStackTrace()
-            Log.i(TAG, "SpeedCommand: FAILED")
-        }
-        try {
-            response = obdConnection.run(VINCommand())
-            responseCommand = response.command.name
-            responseRaw = response.rawResponse
-            Log.i(TAG, "$responseCommand: $responseRaw")
-        } catch (obdException: RuntimeException) {
-            //obdException.printStackTrace()
-            Log.i(TAG, "VINCommand: FAILED")
-        }
+        Log.i(TAG, "Successes:      $successes")
+        Log.i(TAG, "        Speed:      $speedSucc")
+        Log.i(TAG, "        RPM:        $rpmSucc")
+        Log.i(TAG, "        Throttle:   $tpSucc")
+        Log.i(TAG, "        RThrottle:  $rtpSucc")
+        Log.i(TAG, "Failures:       $failures")
+        Log.i(TAG, "        Speed:      $speedFail")
+        Log.i(TAG, "        RPM:        $rpmFail")
+        Log.i(TAG, "        Throttle:   $tpFail")
+        Log.i(TAG, "        RThrottle:  $rtpFail")
+        var succRatio : Double = successes/(successes + failures)
+        var speedSuccRatio : Double = speedSucc/(speedSucc + speedFail)
+        var rpmSuccRatio : Double = rpmSucc/(rpmSucc + rpmFail)
+        var tpSuccRatio : Double = tpSucc/(tpSucc + tpFail)
+        var rtpSuccRatio : Double = rtpSucc/(rtpSucc + rtpFail)
+        Log.i(TAG, "Success Ratio:  $succRatio")
+        Log.i(TAG, "        Speed:      $speedSuccRatio")
+        Log.i(TAG, "        RPM:        $rpmSuccRatio")
+        Log.i(TAG, "        Throttle:   $tpSuccRatio")
+        Log.i(TAG, "        RThrottle:  $rtpSuccRatio")
+        Log.i(TAG, "Duration:       $duration ms")
+        var succPerSec = successes / (duration/1000)
+        Log.i(TAG, "Successes/Second: $succPerSec")
+        return@launch
     }
     return@runBlocking
 }
@@ -235,4 +275,10 @@ class CustomCommand : ObdCommand() {
     //Optional
     override val defaultUnit = ""
     override val handler = { it: ObdRawResponse -> "Calculations to parse value from ${it.processedValue}" }
+}
+
+fun InputStream.toFile(path: String) {
+    use { input ->
+        File(path).outputStream().use { input.copyTo(it) }
+    }
 }

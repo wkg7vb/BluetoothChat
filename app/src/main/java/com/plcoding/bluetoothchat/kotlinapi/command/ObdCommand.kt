@@ -12,7 +12,7 @@ abstract class ObdCommand {
     open val handler: (ObdRawResponse) -> String = { it.value }
 
     val rawCommand: String
-        get() = listOf(mode, pid).joinToString("")
+        get() = listOf(mode, pid).joinToString("") // default is " "
 
     fun handleResponse(rawResponse: ObdRawResponse): ObdResponse {
         val checkedRawResponse = BadResponseException.checkForExceptions(this, rawResponse)
