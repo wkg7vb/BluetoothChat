@@ -29,6 +29,7 @@ import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.net.Socket
 import java.util.UUID
 import kotlin.system.measureTimeMillis
 
@@ -59,9 +60,6 @@ fun createBluetoothConnection(
     // Get the BluetoothDevice object
     val device: BluetoothDevice = bluetoothAdapter.getRemoteDevice(deviceAddress)
 
-    //Get the UUID of the bluetooth device
-//    val uuid:UUID = device.uuids[0].uuid
-
     // Create a BluetoothSocket
     var bluetoothSocket: BluetoothSocket? = null
     try {
@@ -88,14 +86,33 @@ fun createBluetoothConnection(
     // Manage the connection in a separate thread
     val inputStream = bluetoothSocket!!.inputStream
     val outputStream = bluetoothSocket!!.outputStream
-    
-//    try{
-//        outputStream.write(1234)
-//    } catch (writeException: IOException) {
-//        writeException.printStackTrace()
-//    }
 
     manageConnectedSocket(inputStream, outputStream)
+
+    inputStream.close()
+    outputStream.close()
+    bluetoothSocket.close()
+}
+
+fun createWifiConnecion(
+    hostIP: String,
+    portAdd: Int
+) {
+
+    try {
+        val socket = Socket(hostIP, portAdd)
+        val outputStream: OutputStream = socket.getOutputStream()
+        val inputStream: InputStream = socket.getInputStream()
+
+        manageConnectedSocket(inputStream, outputStream)
+
+        inputStream.close()
+        outputStream.close()
+        socket.close()
+    } catch (e: IOException) {
+        e.printStackTrace()
+    }
+    return
 }
 
 fun manageConnectedSocket(
@@ -188,7 +205,7 @@ fun manageConnectedSocket(
                     successes++
                     speedSucc++
                 } catch (obdException: RuntimeException) {
-                    //obdException.printStackTrace()
+                    obdException.printStackTrace()
                     Log.i(TAG, "Speed Command: FAILED")
                     failures++
                     speedFail++

@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.plcoding.bluetoothchat.createBluetoothConnection
+import com.plcoding.bluetoothchat.createWifiConnecion
 import com.plcoding.bluetoothchat.domain.chat.BluetoothDevice
 import com.plcoding.bluetoothchat.presentation.BluetoothUiState
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -27,7 +28,6 @@ fun DeviceScreen(
     state: BluetoothUiState,
     onStartScan: () -> Unit,
     onStopScan: () -> Unit,
-    onStartServer: () -> Unit,
     onDeviceClick: (BluetoothDevice) -> Unit,
     bluetoothAdapter: BluetoothAdapter
 ) {
@@ -47,15 +47,20 @@ fun DeviceScreen(
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround
+        ){
+            Button(onClick = {createWifiConnecion("192.162.0.150", 35000)}){
+                Text(text = "Test wifi with default params")
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceAround
         ) {
             Button(onClick = onStartScan) {
                 Text(text = "Start scan")
             }
             Button(onClick = onStopScan) {
                 Text(text = "Stop scan")
-            }
-            Button(onClick = onStartServer) {
-                Text(text = "Start server")
             }
         }
     }

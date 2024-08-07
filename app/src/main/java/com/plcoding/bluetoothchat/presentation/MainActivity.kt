@@ -118,7 +118,6 @@ class MainActivity : ComponentActivity() {
                                 onStartScan = viewModel::startScan,
                                 onStopScan = viewModel::stopScan,
                                 onDeviceClick = viewModel::connectToDevice,
-                                onStartServer = viewModel::waitForIncomingConnections,
                                 bluetoothAdapter = bluetoothAdapter
                             )
                         }
