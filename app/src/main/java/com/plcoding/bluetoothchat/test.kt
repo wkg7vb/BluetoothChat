@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
+import android.content.Context
+import android.net.wifi.WifiManager
 import android.util.Log
 import android.widget.Chronometer
 import com.plcoding.bluetoothchat.kotlinapi.command.ObdCommand
@@ -32,6 +34,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.Socket
+import java.net.UnknownHostException
 import java.util.UUID
 import kotlin.system.measureTimeMillis
 
@@ -96,6 +99,35 @@ fun createBluetoothConnection(
     bluetoothSocket.close()
 }
 
+fun createNetworkConnection(context: Context, host: String, port: Int) {
+    // Ensure WiFi is enabled (optional)
+    val TAG = "createNetworkConnection"
+    val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
+    if (!wifiManager.isWifiEnabled) {
+        wifiManager.isWifiEnabled = true
+    }
+
+    try {
+        val socket = Socket(host, port)
+        val inputStream: InputStream = socket.getInputStream()
+        val outputStream: OutputStream = socket.getOutputStream()
+
+        Log.i(TAG, "manage connected socket")
+        manageConnectedSocket(inputStream, outputStream)
+        Log.i(TAG, "connected socket managed")
+
+        inputStream.close()
+        outputStream.close()
+        socket.close()
+
+    } catch (e: UnknownHostException) {
+        e.printStackTrace()
+    } catch (e: IOException) {
+        e.printStackTrace()
+    }
+    return
+}
+
 fun createWifiConnection(
     hostIP: String,
     portAdd: Int
@@ -117,6 +149,8 @@ fun createWifiConnection(
         inputStream.close()
         outputStream.close()
         socket.close()
+    }  catch (e: UnknownHostException) {
+        e.printStackTrace()
     } catch (e: IOException) {
         e.printStackTrace()
     }
@@ -204,7 +238,7 @@ fun manageConnectedSocket(
         var tpFail:Double = 0.00
         var rtpFail:Double = 0.00
         var duration = measureTimeMillis{
-            repeat(50) {
+            repeat(100) {
                 try {
                     response = obdConnection.run(SpeedCommand())
                     responseCommand = response.command.name
@@ -213,7 +247,7 @@ fun manageConnectedSocket(
                     successes++
                     speedSucc++
                 } catch (obdException: RuntimeException) {
-                    obdException.printStackTrace()
+                    //obdException.printStackTrace()
                     Log.i(TAG, "Speed Command: FAILED")
                     failures++
                     speedFail++
