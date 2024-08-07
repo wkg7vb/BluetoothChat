@@ -76,3 +76,9 @@ class ATSP0Command : ATCommand() {
     override val name = "ATSP0"
     override val pid = "SP0"
 }
+
+class ATLPCommand : ATCommand() {
+    override val tag = "ATLP"
+    override val name = "ATLP"
+    override val pid = "LP"
+}

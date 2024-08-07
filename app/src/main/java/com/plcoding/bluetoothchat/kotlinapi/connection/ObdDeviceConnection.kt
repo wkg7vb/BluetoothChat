@@ -5,7 +5,6 @@ import com.plcoding.bluetoothchat.kotlinapi.command.ObdRawResponse
 import com.plcoding.bluetoothchat.kotlinapi.command.ObdResponse
 import com.plcoding.bluetoothchat.kotlinapi.command.RegexPatterns.SEARCHING_PATTERN
 import com.plcoding.bluetoothchat.kotlinapi.command.removeAll
-import com.plcoding.bluetoothchat.toFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking

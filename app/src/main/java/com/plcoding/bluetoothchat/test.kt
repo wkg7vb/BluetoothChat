@@ -14,6 +14,7 @@ import com.plcoding.bluetoothchat.kotlinapi.command.ObdResponse
 import com.plcoding.bluetoothchat.kotlinapi.command.at.ATAT0Command
 import com.plcoding.bluetoothchat.kotlinapi.command.at.ATE0Command
 import com.plcoding.bluetoothchat.kotlinapi.command.at.ATL0Command
+import com.plcoding.bluetoothchat.kotlinapi.command.at.ATLPCommand
 import com.plcoding.bluetoothchat.kotlinapi.command.at.ATS1Command
 import com.plcoding.bluetoothchat.kotlinapi.command.at.ATSP0Command
 import com.plcoding.bluetoothchat.kotlinapi.command.at.ResetAdapterCommand
@@ -92,6 +93,7 @@ fun createBluetoothConnection(
     val inputStream = bluetoothSocket!!.inputStream
     val outputStream = bluetoothSocket!!.outputStream
 
+    Log.i(TAG, "Opening API with Bluetooth Device")
     manageConnectedSocket(inputStream, outputStream)
 
     inputStream.close()
@@ -99,52 +101,18 @@ fun createBluetoothConnection(
     bluetoothSocket.close()
 }
 
-fun createNetworkConnection(context: Context, host: String, port: Int) {
-    // Ensure WiFi is enabled (optional)
-    val TAG = "createNetworkConnection"
-    val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
-    if (!wifiManager.isWifiEnabled) {
-        wifiManager.isWifiEnabled = true
-    }
-
-    try {
-        val socket = Socket(host, port)
-        val inputStream: InputStream = socket.getInputStream()
-        val outputStream: OutputStream = socket.getOutputStream()
-
-        Log.i(TAG, "manage connected socket")
-        manageConnectedSocket(inputStream, outputStream)
-        Log.i(TAG, "connected socket managed")
-
-        inputStream.close()
-        outputStream.close()
-        socket.close()
-
-    } catch (e: UnknownHostException) {
-        e.printStackTrace()
-    } catch (e: IOException) {
-        e.printStackTrace()
-    }
-    return
-}
-
 fun createWifiConnection(
     hostIP: String,
     portAdd: Int
 ) {
     val TAG = "createWifiConnection"
-    Log.i(TAG, "createWifiConnection started")
     try {
-        Log.i(TAG, "socket creating")
         val socket = Socket(hostIP, portAdd)
-        Log.i(TAG, "socket created, stream creating")
         val outputStream: OutputStream = socket.getOutputStream()
         val inputStream: InputStream = socket.getInputStream()
-        Log.i(TAG, "streams created")
 
-        Log.i(TAG, "manage connected socket")
+        Log.i(TAG, "Opening API with Network Device")
         manageConnectedSocket(inputStream, outputStream)
-        Log.i(TAG, "connected socket managed")
 
         inputStream.close()
         outputStream.close()
@@ -168,7 +136,7 @@ fun manageConnectedSocket(
     var responseCommand: String
     var responseRaw: ObdRawResponse
 
-    // Code to manage the connection in a separate thread
+    // Code to manage the connection in a separate thread create a class that can call a command, then log the responses, optional side quest - update ui
     launch {
         try {
             response = obdConnection.run(ResetAdapterCommand())
@@ -179,6 +147,7 @@ fun manageConnectedSocket(
             //obdException.printStackTrace()
             Log.i(TAG, "ResetAdapterCommand: FAILED")
         }
+        delay(2500)
         try {
             response = obdConnection.run(ATE0Command())
             responseCommand = response.command.name
@@ -218,15 +187,14 @@ fun manageConnectedSocket(
         try {
             response = obdConnection.run(ATSP0Command())
             responseCommand = response.command.name
-            responseRaw = response.rawResponse
+            responseRaw = response.value
             Log.i(TAG, "$responseCommand: $responseRaw")
         } catch (obdException: RuntimeException) {
             //obdException.printStackTrace()
             Log.i(TAG, "ATSP0Command: FAILED")
         }
-//        outputStream.write("ATZ ATE0 ATL0 ATS1 ATAT0 ATSP0".toByteArray())
-//        outputStream.flush()
-//        inputStream.toFile("testFile.txt")
+
+        //setting up some logging variables
         var successes:Double = 0.00
         var speedSucc:Double = 0.00
         var rpmSucc:Double = 0.00
@@ -237,6 +205,8 @@ fun manageConnectedSocket(
         var rpmFail:Double = 0.00
         var tpFail:Double = 0.00
         var rtpFail:Double = 0.00
+
+        //starting the test portion of the app to generate log report
         var duration = measureTimeMillis{
             repeat(100) {
                 try {
@@ -291,11 +261,25 @@ fun manageConnectedSocket(
                     failures++
                     rtpFail++
                 }
-//                  outputStream.write("010D 010C 0111 0145".toByteArray())
-//                  outputStream.flush()
-//                  inputStream.toFile("testFile.txt")
-            }
+            } //repeat closing
+        } // duration closing
+        try {
+            response = obdConnection.run(ATLPCommand())
+            responseCommand = response.command.name
+            responseRaw = response.rawResponse
+            Log.i(TAG, "$responseCommand: $responseRaw")
+        } catch (obdException: RuntimeException) {
+            //obdException.printStackTrace()
+            Log.i(TAG, "ATLPCommand: FAILED")
         }
+        //Log Report on tested loop
+        var succRatio : Double = successes/(successes + failures)
+        var speedSuccRatio : Double = speedSucc/(speedSucc + speedFail)
+        var rpmSuccRatio : Double = rpmSucc/(rpmSucc + rpmFail)
+        var tpSuccRatio : Double = tpSucc/(tpSucc + tpFail)
+        var rtpSuccRatio : Double = rtpSucc/(rtpSucc + rtpFail)
+        var succPerSec = successes / (duration/1000)
+
         Log.i(TAG, "Successes:      $successes")
         Log.i(TAG, "        Speed:      $speedSucc")
         Log.i(TAG, "        RPM:        $rpmSucc")
@@ -306,38 +290,14 @@ fun manageConnectedSocket(
         Log.i(TAG, "        RPM:        $rpmFail")
         Log.i(TAG, "        Throttle:   $tpFail")
         Log.i(TAG, "        RThrottle:  $rtpFail")
-        var succRatio : Double = successes/(successes + failures)
-        var speedSuccRatio : Double = speedSucc/(speedSucc + speedFail)
-        var rpmSuccRatio : Double = rpmSucc/(rpmSucc + rpmFail)
-        var tpSuccRatio : Double = tpSucc/(tpSucc + tpFail)
-        var rtpSuccRatio : Double = rtpSucc/(rtpSucc + rtpFail)
         Log.i(TAG, "Success Ratio:  $succRatio")
         Log.i(TAG, "        Speed:      $speedSuccRatio")
         Log.i(TAG, "        RPM:        $rpmSuccRatio")
         Log.i(TAG, "        Throttle:   $tpSuccRatio")
         Log.i(TAG, "        RThrottle:  $rtpSuccRatio")
         Log.i(TAG, "Duration:       $duration ms")
-        var succPerSec = successes / (duration/1000)
         Log.i(TAG, "Successes/Second: $succPerSec")
         return@launch
     }
     return@runBlocking
-}
-
-class CustomCommand : ObdCommand() {
-    // Required
-    override val tag = "CUSTOM_COMMAND"
-    override val name = "Custom Command"
-    override val mode = "FF"
-    override val pid = "FF"
-
-    //Optional
-    override val defaultUnit = ""
-    override val handler = { it: ObdRawResponse -> "Calculations to parse value from ${it.processedValue}" }
-}
-
-fun InputStream.toFile(path: String) {
-    use { input ->
-        File(path).outputStream().use { input.copyTo(it) }
-    }
 }
