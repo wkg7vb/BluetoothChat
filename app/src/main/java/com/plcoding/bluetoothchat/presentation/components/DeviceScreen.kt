@@ -18,10 +18,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.plcoding.bluetoothchat.createBluetoothConnection
-import com.plcoding.bluetoothchat.createWifiConnecion
+import com.plcoding.bluetoothchat.createWifiConnection
 import com.plcoding.bluetoothchat.domain.chat.BluetoothDevice
 import com.plcoding.bluetoothchat.presentation.BluetoothUiState
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun DeviceScreen(
@@ -48,7 +51,10 @@ fun DeviceScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround
         ){
-            Button(onClick = {createWifiConnecion("192.162.0.150", 35000)}){
+            Button(onClick = {
+                GlobalScope.launch(Dispatchers.IO){
+                createWifiConnection("192.162.0.150", 35000) } }
+            ){
                 Text(text = "Test wifi with default params")
             }
         }
@@ -96,7 +102,10 @@ fun BluetoothDeviceList(
                     .padding(16.dp)
             )
             Text(text = device.address)
-            Button(onClick = { createBluetoothConnection(device.address, bluetoothAdapter) }) {
+            Button(onClick = {
+                GlobalScope.launch(Dispatchers.IO){
+                    createBluetoothConnection(device.address, bluetoothAdapter) } }
+            ){
                 Text(text = "Test Connection")
             }
         }

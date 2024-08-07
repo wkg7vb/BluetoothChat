@@ -22,6 +22,8 @@ import com.plcoding.bluetoothchat.kotlinapi.command.engine.RelativeThrottlePosit
 import com.plcoding.bluetoothchat.kotlinapi.command.engine.SpeedCommand
 import com.plcoding.bluetoothchat.kotlinapi.command.engine.ThrottlePositionCommand
 import com.plcoding.bluetoothchat.kotlinapi.connection.ObdDeviceConnection
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -94,17 +96,23 @@ fun createBluetoothConnection(
     bluetoothSocket.close()
 }
 
-fun createWifiConnecion(
+fun createWifiConnection(
     hostIP: String,
     portAdd: Int
 ) {
-
+    val TAG = "createWifiConnection"
+    Log.i(TAG, "createWifiConnection started")
     try {
+        Log.i(TAG, "socket creating")
         val socket = Socket(hostIP, portAdd)
+        Log.i(TAG, "socket created, stream creating")
         val outputStream: OutputStream = socket.getOutputStream()
         val inputStream: InputStream = socket.getInputStream()
+        Log.i(TAG, "streams created")
 
+        Log.i(TAG, "manage connected socket")
         manageConnectedSocket(inputStream, outputStream)
+        Log.i(TAG, "connected socket managed")
 
         inputStream.close()
         outputStream.close()
