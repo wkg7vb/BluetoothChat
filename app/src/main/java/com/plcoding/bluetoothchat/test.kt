@@ -133,7 +133,7 @@ fun manageConnectedSocket(
 
     val obdConnection = ObdDeviceConnection(inputStream, outputStream)
 
-    // Code to manage the connection in a separate thread create a class that can call a command, then log the responses, optional side quest - update ui
+    // Code to manage the connection in a separate thread
     launch {
         logCommand(ResetAdapterCommand(), obdConnection)
         delay(2500)
@@ -143,7 +143,7 @@ fun manageConnectedSocket(
         logCommand(ATAT0Command(), obdConnection)
         logCommand(ATSP0Command(), obdConnection)
 
-        var tests = 100
+        var tests = 1000
         var successes = 0
         var duration = measureTimeMillis {
             repeat(tests) {
