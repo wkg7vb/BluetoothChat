@@ -135,7 +135,7 @@ fun userIPPortGetter() {
     var userPort by remember { mutableStateOf("") }
 
     Text(
-        text = "Paired Devices",
+        text = "Network Devices",
         fontWeight = FontWeight.Bold,
         fontSize = 24.sp,
         modifier = Modifier.padding(16.dp)
